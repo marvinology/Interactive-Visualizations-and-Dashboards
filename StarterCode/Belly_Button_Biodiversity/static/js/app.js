@@ -1,60 +1,81 @@
-//margin and radius
-var margin = {top: 20, right: 20, bottom: 20, left: 20},
-  width = 500 - margin.right - margin.left,
-  height = 500 - margin.top - margin.bottom
-  radius = width/2;
+function buildMetadata(sample) {
 
-//arc generato
-var arc = d3.arc()
-    .outterRadius(radius -10)
-    .innerRadius(0);
+  // @TODO: Complete the following function that builds the metadata panel
 
-var pie = d3.pie()
-  .sort(null)
-  .value(function(d) {return d.count;});
+  // Use `d3.json` to fetch the metadata for a sample
+    // Use d3 to select the panel with id of `#sample-metadata`
+    d3.json('/samples/'+sample).then(function(data){
 
-// Set the width of the graph
-var width = parseInt(d3.select("#scatter").style("width"));
+      // metaPanel = d3.select('#sample-metadata');
+      metaPanel = d3.select('#sample-metadata');
+// Use `.html("") to clear any existing metadata
+      metaPanel.html('');
 
-// Set the height of the graph
-var height = width - width / 3.9;
+      Object.entries(data).forEach(([key, value]) => {
+            var cell = metaPanel.append("p");
+            cell.text(key + ': ' + value);
+      });
 
-//define svg
-var svg = d3.select()
-  .select(".chart")
-  .append("svg")
-  .attr("width", svgWidth)
-  .attr("height", svgHeight);
-
-//import datas
-d3.csv("belly_button_data.csv", function(error, data) {
-  d3.csv("belly_button_metadata.csv", function(error2,data2) {
-    if (error) throw error;
-
-    //parse data
-    data.forEach(function(d) {
-      d.count = +d.count;
-      d.belly = d.belly;
     });
 
-    var g = svg.selectAll(".arc")
-      .data(pie(data))
-      .enter().append("g")
-      .attr("class", "arc");
+    // Use `Object.entries` to add each key and value pair to the panel
+    // Hint: Inside the loop, you will need to use d3 to append new
+    // tags for each key-value in the metadata.
+}
 
-    //apend g elements for arc
-    g.append("path")
-      .attr("d", arc)
-      .style("fill","blue")
 
-    //append path of arc
-    g.append("path")
-      .attr("d",arc)
-      .style("fill","blue")
+function buildCharts(sample) {
+
+  // @TODO: Use `d3.json` to fetch the sample data for the plots
+  d3.json('/samples/'+sample).then(function(data){
+    const otu_ids = data.otu_ids;
+    const otu_labels = data.otu_labels;
+    const sample_values = data.sample_values;
+
+    // @TODO: Build a Bubble Chart using the sample data
+    var trace1 = [{
+      x: otu_ids,
+      y: sample_values,
+      mode: 'markers',
+      marker: {
+        size: sample_values,
+        color: otu_ids
+      }
+    }
+  ];
+
+    // var data = [trace1];
+
+    var layout = {
+      title: 'Belly Button Bubble Chart!',
+      showlegend: false,
+      height: 600,
+      width: 1200
+    };
+
+
+
+    Plotly.newPlot('bubble', trace1, layout);
+
+    // @TODO: Build a Pie Chart
+    // HINT: You will need to use slice() to grab the top 10 sample_values,
+    // otu_ids, and labels (10 each).
+    var data = [{
+      values: sample_values.slice(0,10),
+      labels: otu_ids.slice(0,10),
+      hovertext: otu_labels.slice(0,10),
+      type: 'pie'
+    }];
+
+    var pielayout = {
+      height: 400,
+      width: 500
+    };
+
+    Plotly.newPlot('pie', data, pielayout);
 
   });
-});
-
+}
 
 function init() {
   // Grab a reference to the dropdown select element
