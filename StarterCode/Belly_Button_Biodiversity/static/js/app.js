@@ -4,24 +4,21 @@ function buildMetadata(sample) {
 
   // Use `d3.json` to fetch the metadata for a sample
     // Use d3 to select the panel with id of `#sample-metadata`
-    // const metaURL = '/metadata/' + sample;
     d3.json('/metadata/'+sample).then(function(data){
 
       // metaPanel = d3.select('#sample-metadata');
       metaPanel = d3.select('#sample-metadata');
-// Use `.html("") to clear any existing metadata
+      // Use `.html("") to clear any existing metadata
       metaPanel.html('');
-
+      // Use `Object.entries` to add each key and value pair to the panel
+      // Hint: Inside the loop, you will need to use d3 to append new
+      // tags for each key-value in the metadata.
       Object.entries(data).forEach(function([key, value]) {
             var cell = metaPanel.append("p");
             cell.text(key + ': ' + value);
       });
 
     });
-
-    // Use `Object.entries` to add each key and value pair to the panel
-    // Hint: Inside the loop, you will need to use d3 to append new
-    // tags for each key-value in the metadata.
 }
 
 
@@ -32,7 +29,7 @@ function buildCharts(sample) {
     const sample_values = data.sample_values;
     const otu_ids = data.otu_ids;
     const otu_labels = data.otu_labels;
-    
+
 
     // @TODO: Build a Bubble Chart using the sample data
     var trace1 = [{
